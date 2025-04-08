@@ -51,7 +51,7 @@ col2.metric("Detected", df[df["value"] != "Not Detected"].shape[0])
 col3.metric("Detection Rate", f"{(df[df['value'] != 'Not Detected'].shape[0] / len(df)) * 100:.2f}%")
 
 fig = px.bar(df.groupby("sample_date")["value"].apply(lambda x: (x != "Not Detected").sum()).reset_index(),
-             x="sample_date", y="value", title="Listeria Detection Over Time",
+             x="Samples Date", y="Detection Count", title="Listeria Detection Over Time",
              template="plotly_dark", color_discrete_sequence=["#00C49F"])
 
 st.plotly_chart(fig, use_container_width=True)
