@@ -55,3 +55,5 @@ fig = px.bar(df.groupby("sample_date")["value"].apply(lambda x: (x != "Not Detec
              template="plotly_dark", color_discrete_sequence=["#00C49F"])
 
 st.plotly_chart(fig, use_container_width=True)
+# Call after filtering the data
+test_summary_by_code(df_filtered)
