@@ -12,7 +12,32 @@ def load_data():
     df = pd.DataFrame(data)
     df["sample_date"] = pd.to_datetime(df["sample_date"], errors="coerce")
     return df
+def test_summary_by_code(df):
+    st.subheader("🔬 Test Summary by Code")
 
+    if "code" not in df.columns or "value" not in df.columns:
+        st.warning("Missing 'code' or 'value' columns in data.")
+        return
+
+    summary_df = (
+        df.groupby(["code", "value"])
+        .size()
+        .reset_index(name="count")
+        .pivot(index="code", columns="value", values="count")
+        .fillna(0)
+        .astype(int)
+    )
+
+    # Calculate total and detection rate
+    summary_df["Total"] = summary_df.sum(axis=1)
+    if "Not Detected" in summary_df.columns:
+        summary_df["Detection Rate (%)"] = (
+            100 * (summary_df["Total"] - summary_df["Not Detected"]) / summary_df["Total"]
+        ).round(2)
+    else:
+        summary_df["Detection Rate (%)"] = 100.0
+
+    st.dataframe(summary_df.style.background_gradient(cmap="Oranges", axis=1))
 st.title("📊 Overview Dashboard")
 df = load_data()
 
