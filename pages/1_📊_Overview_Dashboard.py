@@ -1,4 +1,6 @@
 import streamlit as st
+# ✅ Set page config FIRST
+st.set_page_config(page_title="Overview Dashboard", layout="wide")
 import pandas as pd
 import plotly.express as px
 from utils.db import listeria_collection
@@ -18,8 +20,7 @@ if logout:
     
 
 
-# ✅ Set page config FIRST
-st.set_page_config(page_title="Overview Dashboard", layout="wide")
+
 
 # 📊 Load data
 @st.cache_data
