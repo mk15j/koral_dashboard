@@ -1,17 +1,33 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from utils.db import listeria_collection
 
+# 🔐 Authentication check
+if "user" not in st.session_state:
+    st.warning("Please log in to access this page.")
+    st.stop()
+
+# 🌐 Optional: Show who is logged in
+st.sidebar.markdown(f"👤 Logged in as: `{st.session_state.user['username']}`")
+logout = st.sidebar.button("Logout")
+if logout:
+    st.session_state.clear()
+    st.success("🔓 Logged out successfully.")
+    st.stop()
+
+# ✅ Set page config FIRST
 st.set_page_config(page_title="Overview Dashboard", layout="wide")
 
+# 📊 Load data
 @st.cache_data
 def load_data():
     data = list(listeria_collection.find({}, {"_id": 0}))
     df = pd.DataFrame(data)
     df["sample_date"] = pd.to_datetime(df["sample_date"], errors="coerce")
     return df
+
+# 📈 Summary by code
 def test_summary_by_code(df):
     st.subheader("🔬 Test Summary by Code")
 
@@ -28,7 +44,6 @@ def test_summary_by_code(df):
         .astype(int)
     )
 
-    # Calculate total and detection rate
     summary_df["Total"] = summary_df.sum(axis=1)
     if "Not Detected" in summary_df.columns:
         summary_df["Detection Rate (%)"] = (
@@ -38,6 +53,8 @@ def test_summary_by_code(df):
         summary_df["Detection Rate (%)"] = 100.0
 
     st.dataframe(summary_df.style.background_gradient(cmap="Oranges", axis=1))
+
+# 🔎 Main page content
 st.title("📊 Overview Dashboard")
 df = load_data()
 
@@ -50,9 +67,12 @@ col1.metric("Total Samples", len(df))
 col2.metric("Detected", df[df["value"] != "Not Detected"].shape[0])
 col3.metric("Detection Rate", f"{(df[df['value'] != 'Not Detected'].shape[0] / len(df)) * 100:.2f}%")
 
-fig = px.bar(df.groupby("sample_date")["value"].apply(lambda x: (x != "Not Detected").sum()).reset_index(),
-             x="sample_date", y="value", title="Listeria Detection Over Time",
-             template="plotly_dark", color_discrete_sequence=["#00C49F"])
-
+fig = px.bar(
+    df.groupby("sample_date")["value"].apply(lambda x: (x != "Not Detected").sum()).reset_index(),
+    x="sample_date", y="value", title="Listeria Detection Over Time",
+    template="plotly_dark", color_discrete_sequence=["#00C49F"]
+)
 st.plotly_chart(fig, use_container_width=True)
 
+# 🧪 Optional: Add test summary below the chart
+test_summary_by_code(df)
