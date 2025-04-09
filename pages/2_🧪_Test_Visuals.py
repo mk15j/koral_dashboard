@@ -42,8 +42,8 @@ if "value" in df_filtered.columns:
     st.plotly_chart(fig_heat, use_container_width=True)
 
 st.subheader("🧬 Detection ratio for Samples")
-if 'value' in df.columns:
-    value_counts = df['value'].value_counts().reset_index()
+if 'value' in df_filtered.columns:
+    value_counts = df_filtered['value'].value_counts().reset_index()
     value_counts.columns = ['value', 'count']
 
     fig_value_donut = px.pie(value_counts, names='value', values='count',
