@@ -15,10 +15,11 @@ if st.session_state.get("user", {}).get("role") != "admin":
 
 if "user" in st.session_state:
     st.sidebar.markdown(f"👤 Logged in as: `{st.session_state.user['username']}`")
-    if st.sidebar.button("Logout"):
-        del st.session_state["user"]
-        st.success("Logged out successfully")
-        st.experimental_rerun()
+    logout = st.sidebar.button("Logout")
+    if logout:
+        st.session_state.clear()  # safer: clears all session data
+        st.success("🔓 Logged out successfully.")
+        st.stop()  # halts execution and prevents rerun issues
         
 import pandas as pd
 st.title("📁 Admin: Upload Listeria Data")
