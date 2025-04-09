@@ -12,7 +12,7 @@ if "user" not in st.session_state:
     
 if st.sidebar.button("Logout"):
     st.session_state.clear()
-    st.experimental_rerun()
+    st.rerun()
     
 
 st.title("Welcome to Koral Seafood Listeria Dashboard")
