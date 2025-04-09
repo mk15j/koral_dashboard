@@ -52,10 +52,17 @@ if 'value' in df_filtered.columns:
     st.plotly_chart(fig_value_donut, use_container_width=True)
 
 st.subheader("🧬 Detection ratio for Samples")
-code_counts = df_filtered['code'].value_counts().reset_index()
-code_counts.columns = ['code', 'count']
+# code_counts = df_filtered['code'].value_counts().reset_index()
+# code_counts.columns = ['code', 'count']
 
-fig_code_donut = px.pie(code_counts, names='code', values='count',
-                        hole=0.4, title="Samples by Machine Code",
-                        color_discrete_sequence=px.colors.sequential.RdBu)
-st.plotly_chart(fig_code_donut, use_container_width=True)
+# fig_code_donut = px.pie(code_counts, names='code', values='count',
+#                         hole=0.4, title="Samples by Machine Code",
+#                         color_discrete_sequence=px.colors.sequential.RdBu)
+# st.plotly_chart(fig_code_donut, use_container_width=True)
+desc_counts = df_filtered['eng_description'].value_counts().reset_index()
+desc_counts.columns = ['eng_description', 'count']
+
+fig_desc_donut = px.pie(desc_counts, names='eng_description', values='count',
+                        hole=0.4, title="Sample Distribution by Description",
+                        color_discrete_sequence=px.colors.sequential.Magma)
+st.plotly_chart(fig_desc_donut, use_container_width=True)
