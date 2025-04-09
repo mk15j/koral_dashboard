@@ -11,6 +11,6 @@ if st.button("Login"):
     if user:
         st.session_state["user"] = user
         st.success(f"Welcome, {user['username']}!")
-        st.switch_page("Home.py")  # You can customize this path
+        st.switch_page("app.py")  # You can customize this path
     else:
         st.error("Invalid username or password")
