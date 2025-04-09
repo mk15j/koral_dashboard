@@ -40,3 +40,13 @@ if "value" in df_filtered.columns:
     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
     fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="group", title="Detection Outcome by Test Code")
     st.plotly_chart(fig_heat, use_container_width=True)
+
+st.subheader("🧬 Detection ratio for Samples")
+if 'value' in df.columns:
+    value_counts = df['value'].value_counts().reset_index()
+    value_counts.columns = ['value', 'count']
+
+    fig_value_donut = px.pie(value_counts, names='value', values='count',
+                             hole=0.4, title="Listeria Test Result Breakdown",
+                             color_discrete_sequence=px.colors.sequential.Tealgrn)
+    st.plotly_chart(fig_value_donut, use_container_width=True)
