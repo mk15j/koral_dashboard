@@ -51,7 +51,7 @@ if 'value' in df_filtered.columns:
                              color_discrete_sequence=px.colors.sequential.Tealgrn)
     st.plotly_chart(fig_value_donut, use_container_width=True)
 
-st.subheader("🧬 Detection ratio for Samples")
+st.subheader("🧬 Detection ratio by Description")
 # code_counts = df_filtered['code'].value_counts().reset_index()
 # code_counts.columns = ['code', 'count']
 
