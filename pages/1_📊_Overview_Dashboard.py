@@ -1,5 +1,6 @@
 import streamlit as st
-
+import pandas as pd
+import plotly.express as px
 from utils.db import listeria_collection
 
 # 🔐 Authentication check
@@ -15,8 +16,7 @@ if logout:
     st.success("🔓 Logged out successfully.")
     st.stop()
     
-import pandas as pd
-import plotly.express as px
+
 
 # ✅ Set page config FIRST
 st.set_page_config(page_title="Overview Dashboard", layout="wide")
