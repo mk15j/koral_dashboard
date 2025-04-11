@@ -32,13 +32,13 @@ if not all_data:
     st.warning("No data found with X and Y coordinates in MongoDB.")
 else:
     df = pd.DataFrame(all_data)
-    df['date'] = pd.to_datetime(df['date']).dt.date
+    df['sample_date'] = pd.to_datetime(df['sample_date']).dt.date
 
-    available_dates = df['date'].dropna().unique()
+    available_dates = df['sample_date'].dropna().unique()
     selected_date = st.selectbox("Select a Date", sorted(available_dates, reverse=True))
 
     if selected_date:
-        filtered = df[df['date'] == selected_date].copy()
+        filtered = df[df['sample_date'] == selected_date].copy()
         filtered = filtered.rename(columns={"point": "points"})
 
         if not filtered.empty:
