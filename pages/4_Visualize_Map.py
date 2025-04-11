@@ -8,9 +8,9 @@ from pymongo import MongoClient
 from datetime import datetime
 
 # MongoDB connection
-client = MongoClient(st.secrets["MONGO_URI"])
-db = client["quality"]
-collection = db["samples"]
+client = MongoClient(st.secrets["mongo_uri"])
+db = client["koral"]
+listeria_collection = db["listeria"]
 
 def load_image(image_path="koral6.png"):
     if not os.path.exists(image_path):
@@ -51,7 +51,7 @@ st.title("Listeria Sample Map Visualization")
 image = load_image()
 
 # Get unique dates from database
-all_data = list(collection.find({"x": {"$exists": True}, "y": {"$exists": True}}))
+all_data = list(listeria_collection.find({"x": {"$exists": True}, "y": {"$exists": True}}))
 if not all_data:
     st.warning("No data found with X and Y coordinates in MongoDB.")
 else:
