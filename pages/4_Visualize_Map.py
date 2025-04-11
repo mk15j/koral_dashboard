@@ -48,6 +48,15 @@ else:
             filtered['y'] = pd.to_numeric(filtered['y'], errors='coerce')
             filtered['values'] = pd.to_numeric(filtered['values'], errors='coerce')
 
+            # Construct detailed hover text
+            filtered['hover_text'] = (
+                "<b>Point:</b> " + filtered['points'] + "<br>"
+                + "<b>Description:</b> " + filtered['description'].astype(str) + "<br>"
+                + "<b>Status:</b> " + filtered['values'].map({1: "Positive", 0: "Negative"}).fillna("Unknown") + "<br>"
+                + "<b>X:</b> " + filtered['x'].astype(str) + "<br>"
+                + "<b>Y:</b> " + filtered['y'].astype(str)
+            )
+
             # Create a Plotly scatter plot
             fig = px.scatter(
                 filtered,
@@ -55,16 +64,15 @@ else:
                 y='y',
                 color=filtered['values'].map({1: "Positive", 0: "Negative", np.nan: "Unknown"}),
                 color_discrete_map={"Positive": "#FF0000", "Negative": "#008000", "Unknown": "#FFBF00"},
-                hover_data={
-                    "points": True,
-                    "description": True,
-                    "x": False,
-                    "y": False,
-                    "values": False
-                },
+                hover_name='points',
+                hover_data={"x": False, "y": False, "values": False, "description": False, 'hover_text': True},
+                custom_data=['hover_text'],
                 title=f"Listeria Points on {selected_date}"
             )
-            fig.update_traces(marker=dict(size=12, line=dict(width=1, color='DarkSlateGrey')))
+            fig.update_traces(
+                marker=dict(size=12, line=dict(width=1, color='DarkSlateGrey')),
+                hovertemplate="%{customdata[0]}<extra></extra>"
+            )
             fig.update_layout(
                 xaxis=dict(visible=False),
                 yaxis=dict(visible=False),
