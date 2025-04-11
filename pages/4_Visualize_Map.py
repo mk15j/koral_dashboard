@@ -6,6 +6,7 @@ import numpy as np
 import os
 from pymongo import MongoClient
 from datetime import datetime
+import plotly.express as px
 
 # MongoDB connection
 client = MongoClient(st.secrets["MONGO_URI"])
@@ -19,31 +20,6 @@ def load_image(image_path="koral6.png"):
     image = cv2.imread(image_path)
     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-def plot_markers(image, data):
-    if image is None or data.empty:
-        return
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.imshow(image)
-
-    required_columns = {'x', 'y', 'values', 'points'}
-    if not required_columns.issubset(data.columns):
-        st.error(f"Missing required columns: {required_columns - set(data.columns)}")
-        return
-
-    unique_positions = data.groupby(['x', 'y'])['values'].max().reset_index()
-
-    for _, row in unique_positions.iterrows():
-        x, y, value = row['x'], row['y'], row['values']
-        color = '#FFBF00' if pd.isna(value) else '#FF0000' if value == 1 else '#008000'
-        ax.add_patch(plt.Circle((x, y), 9, color=color, fill=True))
-        points_at_location = data[(data['x'] == x) & (data['y'] == y)]
-        point_numbers = ', '.join(map(str, points_at_location['points']))
-        ax.text(x, y - 15, point_numbers, color=color, fontsize=12, ha='center')
-
-    ax.axis('off')
-    st.pyplot(fig)
-
 # ---- Streamlit App ----
 st.title("Listeria Sample Map Visualization")
 
@@ -56,16 +32,47 @@ if not all_data:
     st.warning("No data found with X and Y coordinates in MongoDB.")
 else:
     df = pd.DataFrame(all_data)
-    df['sample_date'] = pd.to_datetime(df['sample_date']).dt.date
+    df['date'] = pd.to_datetime(df['date']).dt.date
 
-    available_dates = df['sample_date'].dropna().unique()
+    available_dates = df['date'].dropna().unique()
     selected_date = st.selectbox("Select a Date", sorted(available_dates, reverse=True))
 
     if selected_date:
-        filtered = df[df['sample_date'] == selected_date]
-        filtered = filtered.rename(columns={"point": "points"})  # adapt if your column is named 'point'
+        filtered = df[df['date'] == selected_date].copy()
+        filtered = filtered.rename(columns={"point": "points"})
 
         if not filtered.empty:
-            plot_markers(image, filtered)
+            # Normalize columns
+            filtered['points'] = filtered['points'].astype(str)
+            filtered['x'] = pd.to_numeric(filtered['x'], errors='coerce')
+            filtered['y'] = pd.to_numeric(filtered['y'], errors='coerce')
+            filtered['values'] = pd.to_numeric(filtered['values'], errors='coerce')
+
+            # Create a Plotly scatter plot
+            fig = px.scatter(
+                filtered,
+                x='x',
+                y='y',
+                color=filtered['values'].map({1: "Positive", 0: "Negative", np.nan: "Unknown"}),
+                color_discrete_map={"Positive": "#FF0000", "Negative": "#008000", "Unknown": "#FFBF00"},
+                hover_data={
+                    "points": True,
+                    "description": True,
+                    "x": False,
+                    "y": False,
+                    "values": False
+                },
+                title=f"Listeria Points on {selected_date}"
+            )
+            fig.update_traces(marker=dict(size=12, line=dict(width=1, color='DarkSlateGrey')))
+            fig.update_layout(
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                showlegend=False,
+                margin=dict(l=0, r=0, t=40, b=0)
+            )
+            st.plotly_chart(fig, use_container_width=True)
         else:
             st.warning("No data found for the selected date.")
