@@ -60,14 +60,15 @@ else:
 
             # Create lookup for last 15 days' values per point
             start_date = selected_date - timedelta(days=14)
-            recent_data = df[(df['sample_sample_date'] >= start_date) & (df['date'] <= selected_date)].copy()
+            recent_data = df[(df['sample_date'] >= start_date) & (df['sample_date'] <= selected_date)].copy()
             recent_data = recent_data.rename(columns={"point": "points"})
             recent_data['points'] = recent_data['points'].astype(str)
             recent_data['values'] = pd.to_numeric(recent_data['values'], errors='coerce')
 
             recent_lookup = recent_data.groupby('points').apply(
-                lambda x: "<br>".join(x.sort_values('sample_date')[['sample_date', 'values']]
-                                     .apply(lambda row: f"{row['sample_date']}: {'Positive' if row['values'] == 1 else 'Negative' if row['values'] == 0 else 'Unknown'}", axis=1)))
+                lambda x: "<br>&nbsp;&nbsp;".join(x.sort_values('date')[['date', 'values']]
+                                         .apply(lambda row: f"{row['sample_date']}: {'<b style=\"color:red\">Positive</b>' if row['values'] == 1 else '<b style=\"color:green\">Negative</b>' if row['values'] == 0 else 'Unknown'}", axis=1))
+            )
 
             filtered['history'] = filtered['points'].map(recent_lookup).fillna("No history available")
 
@@ -77,7 +78,7 @@ else:
                 + "<b>Status:</b> " + filtered['values'].map({1: "Positive", 0: "Negative"}).fillna("Unknown") + "<br>"
                 + "<b>X:</b> " + filtered['x'].astype(str) + "<br>"
                 + "<b>Y:</b> " + filtered['y'].astype(str) + "<br>"
-                + "<b>Last 15 Days:</b><br>" + filtered['history']
+                + "<b>Last 15 Days:</b><br>&nbsp;&nbsp;" + filtered['history']
             )
 
             # Create figure with background image
