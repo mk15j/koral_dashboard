@@ -5,3 +5,4 @@ pymongo
 bcrypt
 python-dotenv
 matplotlib
+opencv-python-headless
