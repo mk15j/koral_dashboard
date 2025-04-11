@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from datetime import datetime
 
 # MongoDB connection
-client = MongoClient(st.secrets["mongo_uri"])
+client = MongoClient(st.secrets["MONGO_URI"])
 db = client["koral"]
 listeria_collection = db["listeria"]
 
