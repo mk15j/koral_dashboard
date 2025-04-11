@@ -48,6 +48,10 @@ else:
             filtered['y'] = pd.to_numeric(filtered['y'], errors='coerce')
             filtered['values'] = pd.to_numeric(filtered['values'], errors='coerce')
 
+            # Ensure description column exists
+            if 'description' not in filtered.columns:
+                filtered['description'] = ""
+
             # Construct detailed hover text
             filtered['hover_text'] = (
                 "<b>Point:</b> " + filtered['points'] + "<br>"
