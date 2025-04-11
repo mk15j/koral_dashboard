@@ -66,8 +66,9 @@ else:
             recent_data['values'] = pd.to_numeric(recent_data['values'], errors='coerce')
 
             recent_lookup = recent_data.groupby('points').apply(
-                lambda x: "<br>&nbsp;&nbsp;".join(x.sort_values('date')[['date', 'values']]
-                                         .apply(lambda row: f"{row['sample_date']}: {'<b style=\"color:red\">Positive</b>' if row['values'] == 1 else '<b style=\"color:green\">Negative</b>' if row['values'] == 0 else 'Unknown'}", axis=1))
+                lambda x: "<br>&nbsp;&nbsp;".join(x.sort_values('sample_date').apply(
+                    lambda row: f"{row['sample_date']}: {'<b style=\"color:red\">Positive</b>' if row['values'] == 1 else '<b style=\"color:green\">Negative</b>' if row['values'] == 0 else 'Unknown'}",
+                    axis=1))
             )
 
             filtered['history'] = filtered['points'].map(recent_lookup).fillna("No history available")
