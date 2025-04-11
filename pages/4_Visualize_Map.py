@@ -7,6 +7,7 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 import plotly.express as px
+import plotly.graph_objects as go
 
 # MongoDB connection
 client = MongoClient(st.secrets["MONGO_URI"])
@@ -61,30 +62,47 @@ else:
                 + "<b>Y:</b> " + filtered['y'].astype(str)
             )
 
-            # Create a Plotly scatter plot
-            fig = px.scatter(
-                filtered,
-                x='x',
-                y='y',
-                color=filtered['values'].map({1: "Positive", 0: "Negative", np.nan: "Unknown"}),
-                color_discrete_map={"Positive": "#FF0000", "Negative": "#008000", "Unknown": "#FFBF00"},
-                hover_name='points',
-                hover_data={"x": False, "y": False, "values": False, "description": False, 'hover_text': True},
-                custom_data=['hover_text'],
+            # Get image dimensions for scaling
+            height, width, _ = image.shape
+
+            # Create figure with background image
+            fig = go.Figure()
+            fig.add_layout_image(
+                dict(
+                    source=image,
+                    xref="x",
+                    yref="y",
+                    x=0,
+                    y=height,
+                    sizex=width,
+                    sizey=height,
+                    sizing="stretch",
+                    layer="below"
+                )
+            )
+
+            # Add scatter plot of points
+            fig.add_trace(go.Scatter(
+                x=filtered['x'],
+                y=height - filtered['y'],  # invert y to match image coordinates
+                mode='markers',
+                marker=dict(
+                    size=12,
+                    color=filtered['values'].map({1: "#FF0000", 0: "#008000"}).fillna("#FFBF00"),
+                    line=dict(width=1, color='DarkSlateGrey')
+                ),
+                customdata=filtered[['hover_text']],
+                hovertemplate="%{customdata[0]}<extra></extra>"
+            ))
+
+            fig.update_layout(
+                xaxis=dict(visible=False, range=[0, width]),
+                yaxis=dict(visible=False, range=[0, height]),
+                showlegend=False,
+                margin=dict(l=0, r=0, t=40, b=0),
                 title=f"Listeria Points on {selected_date}"
             )
-            fig.update_traces(
-                marker=dict(size=12, line=dict(width=1, color='DarkSlateGrey')),
-                hovertemplate="%{customdata[0]}<extra></extra>"
-            )
-            fig.update_layout(
-                xaxis=dict(visible=False),
-                yaxis=dict(visible=False),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                showlegend=False,
-                margin=dict(l=0, r=0, t=40, b=0)
-            )
+
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.warning("No data found for the selected date.")
