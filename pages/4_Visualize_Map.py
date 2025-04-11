@@ -60,13 +60,14 @@ else:
 
             # Create lookup for last 15 days' values per point
             start_date = selected_date - timedelta(days=14)
-            recent_data = df[(df['sample_date'] >= start_date) & (df['sample_date'] <= selected_date)].copy()
-            recent_data = recent_data.rename(columns={"point": "points"})  # Ensures consistency
+            recent_data = df[(df['sample_sample_date'] >= start_date) & (df['date'] <= selected_date)].copy()
+            recent_data = recent_data.rename(columns={"point": "points"})
             recent_data['points'] = recent_data['points'].astype(str)
             recent_data['values'] = pd.to_numeric(recent_data['values'], errors='coerce')
+
             recent_lookup = recent_data.groupby('points').apply(
-                lambda x: " | ".join(x.sort_values('sample_date')[['sample_date', 'values']]
-                                      .apply(lambda row: f"{row['sample_date']}: {'Positive' if row['values'] == 1 else 'Negative' if row['values'] == 0 else 'Unknown'}", axis=1)))
+                lambda x: "<br>".join(x.sort_values('sample_date')[['sample_date', 'values']]
+                                     .apply(lambda row: f"{row['sample_date']}: {'Positive' if row['values'] == 1 else 'Negative' if row['values'] == 0 else 'Unknown'}", axis=1)))
 
             filtered['history'] = filtered['points'].map(recent_lookup).fillna("No history available")
 
