@@ -7,25 +7,36 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 import plotly.express as px
-import plotly.graph_objects as go
+import plotly.graph_objects as go #0
+from PIL import Image
+import io
+import base64
 
 # MongoDB connection
 client = MongoClient(st.secrets["MONGO_URI"])
 db = client["koral"]
 listeria_collection = db["listeria"]
-
-def load_image(image_path="koral6.png"):
+#1
+def load_image_base64(image_path="koral6.png"):
     if not os.path.exists(image_path):
         st.error(f"Image not found at {image_path}")
-        return None
-    image = cv2.imread(image_path)
-    return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        return None, None, None
+    image = Image.open(image_path)
+    buffered = io.BytesIO()
+    image.save(buffered, format="PNG")
+    encoded = base64.b64encode(buffered.getvalue()).decode()
+    return image, f"data:image/png;base64,{encoded}", image.size  # PIL Image, base64, (width, height)
 
 # ---- Streamlit App ----
 st.title("Listeria Sample Map Visualization")
 
 # Load image for background
-image = load_image()
+#image = load_image()
+
+# Load image for background
+image_pil, image_base64, (width, height) = load_image_base64()
+if image_pil is None:
+    st.stop()
 
 # Get unique dates from database
 all_data = list(listeria_collection.find({"x": {"$exists": True}, "y": {"$exists": True}}))
@@ -67,9 +78,10 @@ else:
 
             # Create figure with background image
             fig = go.Figure()
+            #3
             fig.add_layout_image(
                 dict(
-                    source=image,
+                    source=image_base64,
                     xref="x",
                     yref="y",
                     x=0,
