@@ -61,6 +61,8 @@ else:
             # Create lookup for last 15 days' values per point
             start_date = selected_date - timedelta(days=14)
             recent_data = df[(df['sample_date'] >= start_date) & (df['sample_date'] <= selected_date)].copy()
+            recent_data = recent_data.rename(columns={"point": "points"})  # Ensures consistency
+            recent_data['points'] = recent_data['points'].astype(str)
             recent_data['values'] = pd.to_numeric(recent_data['values'], errors='coerce')
             recent_lookup = recent_data.groupby('points').apply(
                 lambda x: " | ".join(x.sort_values('sample_date')[['sample_date', 'values']]
