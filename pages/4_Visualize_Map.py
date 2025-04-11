@@ -74,7 +74,7 @@ else:
             )
 
             # Get image dimensions for scaling
-            height, width, _ = image.shape
+            #height, width, _ = image.shape
 
             # Create figure with background image
             fig = go.Figure()
