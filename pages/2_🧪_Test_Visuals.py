@@ -63,44 +63,56 @@ st.subheader("🧬 Detection Outcome by Code (with Trendline)")
 if "value" in df_filtered.columns:
     import plotly.graph_objects as go
 
-    # Prepare base data
+    # Aggregate detection data
     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    heat_df['value_label'] = heat_df['value'].map({1: 'Detected', 0: 'Not Detected', -1: 'Unknown'})
 
-    # Pivot to get counts per code
-    pivot_df = heat_df.pivot(index='code', columns='value', values='count').fillna(0).reset_index()
+    # Create pivot for Detected and Not Detected
+    pivot_df = heat_df.pivot(index="code", columns="value", values="count").fillna(0)
+    pivot_df.columns = pivot_df.columns.astype(int)  # Ensure columns are integers
+    pivot_df = pivot_df.sort_index()
 
-    # Build figure manually with bars
+    codes = pivot_df.index.tolist()
+    detected_counts = pivot_df.get(1, pd.Series([0]*len(codes), index=codes))
+    not_detected_counts = pivot_df.get(0, pd.Series([0]*len(codes), index=codes))
+
+    # Create stacked bar chart with trendline
     fig = go.Figure()
 
-    if 0 in heat_df['value'].values:
-        fig.add_bar(
-            x=pivot_df['code'], y=pivot_df[0],
-            name="Not Detected", marker_color="#2CA02C"
-        )
+    # Not Detected bar
+    fig.add_trace(go.Bar(
+        x=codes,
+        y=not_detected_counts,
+        name="Not Detected",
+        marker_color="#2CA02C"
+    ))
 
-    if 1 in heat_df['value'].values:
-        fig.add_bar(
-            x=pivot_df['code'], y=pivot_df[1],
-            name="Detected", marker_color="#D62728"
-        )
+    # Detected bar
+    fig.add_trace(go.Bar(
+        x=codes,
+        y=detected_counts,
+        name="Detected",
+        marker_color="#D62728"
+    ))
 
-        # Add line trend for detection
-        fig.add_trace(go.Scatter(
-            x=pivot_df['code'], y=pivot_df[1],
-            mode='lines+markers', name='Detection Trendline',
-            line=dict(color='red', width=2, dash='dash')
-        ))
+    # Trendline over Detected
+    fig.add_trace(go.Scatter(
+        x=codes,
+        y=detected_counts,
+        name="Detection Trendline",
+        mode="lines+markers",
+        line=dict(color="red", width=2, dash="dash")
+    ))
 
     fig.update_layout(
-        barmode='stack',
+        barmode="stack",
         title="Detection Outcome by Test Code (with Detection Trendline)",
         xaxis_title="Test Code",
         yaxis_title="Test Count",
-        legend_title="Detection Value"
+        legend_title="Detection Outcome"
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
 
 
 # 🧬 Detection ratio for Samples
