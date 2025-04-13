@@ -17,8 +17,8 @@ if st.sidebar.button("Logout"):
     st.success("🔓 Logged out successfully.")
     st.stop()
 
-# 🧪 Main content
-st.title("🧪 Test Summary Visuals")
+# 🦢 Main content
+st.title("🦢 Test Summary Visuals")
 
 @st.cache_data
 def load_data():
@@ -37,12 +37,15 @@ st.sidebar.header("Filters")
 date_range = st.sidebar.date_input("Date Range", [df["sample_date"].min(), df["sample_date"].max()])
 df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sample_date"] <= pd.to_datetime(date_range[1]))]
 
-# 🔢 Test Frequency by Code
+# 🔢 Test Frequency by Code (Stacked)
 st.subheader("🔢 Test Frequency by Code")
-code_count = df_filtered["code"].value_counts().reset_index()
-code_count.columns = ["Code", "Test Count"]
-fig_code = px.bar(code_count, x="Code", y="Test Count", color="Test Count", title="Number of Tests by Code", color_continuous_scale="Sunsetdark")
-st.plotly_chart(fig_code, use_container_width=True)
+if "value" in df_filtered.columns:
+    freq_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
+    freq_df['value'] = freq_df['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    fig_code = px.bar(freq_df, x="code", y="count", color="value", barmode="stack",
+                      title="Number of Tests by Code (Detected vs Not Detected)",
+                      color_discrete_map={"Detected": "#FF4C4C", "Not Detected": "#28A745", "Unknown": "#FFA500"})
+    st.plotly_chart(fig_code, use_container_width=True)
 
 # 🏭 Test Frequency by Description
 st.subheader("🏭 Test Frequency by Description")
