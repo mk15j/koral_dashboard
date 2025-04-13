@@ -17,8 +17,8 @@ if st.sidebar.button("Logout"):
     st.success("🔓 Logged out successfully.")
     st.stop()
 
-# 🦢 Main content
-st.title("🦢 Test Summary Visuals")
+# 🥚 Main content
+st.title("🥚 Test Summary Visuals")
 
 @st.cache_data
 def load_data():
@@ -50,7 +50,7 @@ if "value" in df_filtered.columns:
         color="value",
         barmode="stack",
         title="Number of Tests by Code (Detected vs Not Detected)",
-        color_discrete_map={"Detected": "#FF4C4C", "Not Detected": "#28A745", "Unknown": "#FFA500"}
+        color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
     )
     fig_code.update_layout(legend_title_text="Detection Outcome")
     st.plotly_chart(fig_code, use_container_width=True)
@@ -69,17 +69,17 @@ if "value" in df_filtered.columns:
     stacked_df['value'] = stacked_df['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
     fig_stacked = px.bar(stacked_df, x="code", y="count", color="value", barmode="stack", 
                          title="Detected vs Not Detected by Test Code",
-                         color_discrete_map={"Detected": "#FF4C4C", "Not Detected": "#28A745", "Unknown": "#FFA500"})
+                         color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"})
     st.plotly_chart(fig_stacked, use_container_width=True)
 
 # 🧬 Detection ratio for Samples
 st.subheader("🧬 Detection ratio for Samples")
 if 'value' in df_filtered.columns:
-    value_counts = df_filtered['value'].value_counts().reset_index()
+    value_counts = df_filtered['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown").value_counts().reset_index()
     value_counts.columns = ['value', 'count']
     fig_value_donut = px.pie(value_counts, names='value', values='count',
                              hole=0.4, title="Listeria Test Result Breakdown",
-                             color_discrete_sequence=px.colors.sequential.Tealgrn)
+                             color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"})
     st.plotly_chart(fig_value_donut, use_container_width=True)
 
 # 🧬 Detection ratio by Description
