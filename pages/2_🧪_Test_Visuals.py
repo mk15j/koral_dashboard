@@ -45,11 +45,11 @@ fig_code = px.bar(code_count, x="Code", y="Test Count", color="Test Count", titl
 st.plotly_chart(fig_code, use_container_width=True)
 
 # 🏭 Test Frequency by Description
-st.subheader("🏭 Test Frequency by Description")
-desc_count = df_filtered["eng_description"].value_counts().reset_index()
-desc_count.columns = ["Description", "Test Count"]
-fig_desc = px.bar(desc_count, x="Test Count", y="Description", orientation="h", title="Test Frequency by Sample Description", color="Test Count", color_continuous_scale="Agsunset")
-st.plotly_chart(fig_desc, use_container_width=True)
+# st.subheader("🏭 Test Frequency by Description")
+# desc_count = df_filtered["eng_description"].value_counts().reset_index()
+# desc_count.columns = ["Description", "Test Count"]
+# fig_desc = px.bar(desc_count, x="Test Count", y="Description", orientation="h", title="Test Frequency by Sample Description", color="Test Count", color_continuous_scale="Agsunset")
+# st.plotly_chart(fig_desc, use_container_width=True)
 
 # 🧬 Detection Outcome by Code
 st.subheader("🧬 Detection Outcome by Code")
