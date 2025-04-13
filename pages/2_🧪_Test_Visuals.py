@@ -39,8 +39,9 @@ df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sam
 
 # 🔢 Test Frequency by Code (Stacked)
 st.subheader("🔢 Test Frequency by Code")
-if "value" in df_filtered.columns:
-    df_filtered['Detection'] = df_filtered['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+if "value" in df_filtered.columns and "code" in df_filtered.columns:
+    df_filtered = df_filtered.copy()
+    df_filtered['Detection'] = df_filtered['value'].apply(lambda x: "Detected" if x == 1 else ("Not Detected" if x == 0 else "Unknown"))
     code_detection_counts = df_filtered.groupby(['code', 'Detection']).size().reset_index(name='count')
 
     fig_code = px.bar(
