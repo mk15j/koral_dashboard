@@ -40,14 +40,14 @@ df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sam
 # 🔢 Test Frequency by Code (Stacked)
 st.subheader("🔢 Test Frequency by Code")
 if "value" in df_filtered.columns:
-    freq_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    freq_df['value'] = freq_df['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    df_filtered['Detection'] = df_filtered['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    code_detection_counts = df_filtered.groupby(['code', 'Detection']).size().reset_index(name='count')
 
     fig_code = px.bar(
-        freq_df,
+        code_detection_counts,
         x="code",
         y="count",
-        color="value",
+        color="Detection",
         barmode="stack",
         title="Number of Tests by Code (Detected vs Not Detected)",
         color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
