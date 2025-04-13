@@ -52,11 +52,56 @@ st.plotly_chart(fig_code, use_container_width=True)
 # st.plotly_chart(fig_desc, use_container_width=True)
 
 # 🧬 Detection Outcome by Code
-st.subheader("🧬 Detection Outcome by Code")
+# st.subheader("🧬 Detection Outcome by Code")
+# if "value" in df_filtered.columns:
+#     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
+#     fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="stack", title="Detection Outcome by Test Code")
+#     st.plotly_chart(fig_heat, use_container_width=True)
+
+# 🧬 Detection Outcome by Code with Trendline
+st.subheader("🧬 Detection Outcome by Code (with Trendline)")
 if "value" in df_filtered.columns:
+    import plotly.graph_objects as go
+
+    # Prepare base data
     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="stack", title="Detection Outcome by Test Code")
-    st.plotly_chart(fig_heat, use_container_width=True)
+    heat_df['value_label'] = heat_df['value'].map({1: 'Detected', 0: 'Not Detected', -1: 'Unknown'})
+
+    # Pivot to get counts per code
+    pivot_df = heat_df.pivot(index='code', columns='value', values='count').fillna(0).reset_index()
+
+    # Build figure manually with bars
+    fig = go.Figure()
+
+    if 0 in heat_df['value'].values:
+        fig.add_bar(
+            x=pivot_df['code'], y=pivot_df[0],
+            name="Not Detected", marker_color="#2CA02C"
+        )
+
+    if 1 in heat_df['value'].values:
+        fig.add_bar(
+            x=pivot_df['code'], y=pivot_df[1],
+            name="Detected", marker_color="#D62728"
+        )
+
+        # Add line trend for detection
+        fig.add_trace(go.Scatter(
+            x=pivot_df['code'], y=pivot_df[1],
+            mode='lines+markers', name='Detection Trendline',
+            line=dict(color='red', width=2, dash='dash')
+        ))
+
+    fig.update_layout(
+        barmode='stack',
+        title="Detection Outcome by Test Code (with Detection Trendline)",
+        xaxis_title="Test Code",
+        yaxis_title="Test Count",
+        legend_title="Detection Value"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
 
 # 🧬 Detection ratio for Samples
 st.subheader("🧬 Detection ratio for Samples")
