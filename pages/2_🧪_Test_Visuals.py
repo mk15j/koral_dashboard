@@ -59,17 +59,38 @@ if "value" in df_filtered.columns:
     fig_code.update_layout(legend_title_text="Detection Outcome")
     st.plotly_chart(fig_code, use_container_width=True)
 
-# 🏭 Test Frequency by Description
-st.subheader("🏭 Test Frequency by Description")
+# 🏠 Test Frequency by Description
+st.subheader("🏠 Test Frequency by Description")
 desc_count = df_filtered["eng_description"].value_counts().reset_index()
 desc_count.columns = ["Description", "Test Count"]
 fig_desc = px.bar(desc_count, x="Test Count", y="Description", orientation="h", title="Test Frequency by Sample Description", color="Test Count", color_continuous_scale="Agsunset")
 st.plotly_chart(fig_desc, use_container_width=True)
 
-# 🧬 Detection Outcome by Code
+# 🧬 Detection Outcome by Code (Stacked Bar)
 st.subheader("🧬 Detection Outcome by Code")
 if "value" in df_filtered.columns:
-    heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="group", title="Detection Outcome by Test Code")
-    st.plotly_chart(fig_heat, use_container_width=True)
+    stacked_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
+    stacked_df['value'] = stacked_df['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    fig_stacked = px.bar(stacked_df, x="code", y="count", color="value", barmode="stack", 
+                         title="Detected vs Not Detected by Test Code",
+                         color_discrete_map={"Detected": "#FF4C4C", "Not Detected": "#28A745", "Unknown": "#FFA500"})
+    st.plotly_chart(fig_stacked, use_container_width=True)
 
+# 🧬 Detection ratio for Samples
+st.subheader("🧬 Detection ratio for Samples")
+if 'value' in df_filtered.columns:
+    value_counts = df_filtered['value'].value_counts().reset_index()
+    value_counts.columns = ['value', 'count']
+    fig_value_donut = px.pie(value_counts, names='value', values='count',
+                             hole=0.4, title="Listeria Test Result Breakdown",
+                             color_discrete_sequence=px.colors.sequential.Tealgrn)
+    st.plotly_chart(fig_value_donut, use_container_width=True)
+
+# 🧬 Detection ratio by Description
+st.subheader("🧬 Detection ratio by Description")
+desc_counts = df_filtered['eng_description'].value_counts().reset_index()
+desc_counts.columns = ['eng_description', 'count']
+fig_desc_donut = px.pie(desc_counts, names='eng_description', values='count',
+                        hole=0.4, title="Sample Distribution by Description",
+                        color_discrete_sequence=px.colors.sequential.Magma)
+st.plotly_chart(fig_desc_donut, use_container_width=True)
