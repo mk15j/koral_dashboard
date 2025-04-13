@@ -41,7 +41,8 @@ df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sam
 st.subheader("🔢 Test Frequency by Code")
 if "value" in df_filtered.columns and "code" in df_filtered.columns:
     df_filtered = df_filtered.copy()
-    df_filtered['Detection'] = df_filtered['value'].apply(lambda x: "Detected" if x == 1 else ("Not Detected" if x == 0 else "Unknown"))
+    df_filtered = df_filtered[df_filtered['value'].isin([0, 1])]  # Filter only 0 and 1
+    df_filtered['Detection'] = df_filtered['value'].map({1: "Detected", 0: "Not Detected"})
     code_detection_counts = df_filtered.groupby(['code', 'Detection']).size().reset_index(name='count')
 
     fig_code = px.bar(
@@ -51,7 +52,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         color="Detection",
         barmode="stack",
         title="Number of Tests by Code (Detected vs Not Detected)",
-        color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
+        color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C"}
     )
     fig_code.update_layout(legend_title_text="Detection Outcome")
     st.plotly_chart(fig_code, use_container_width=True)
