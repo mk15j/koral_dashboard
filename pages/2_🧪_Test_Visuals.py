@@ -70,7 +70,7 @@ st.plotly_chart(fig_desc, use_container_width=True)
 st.subheader("🧬 Detection Outcome by Code")
 if "value" in df_filtered.columns:
     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="group", title="Detection Outcome by Test Code")
+    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="stack", title="Detection Outcome by Test Code")
     st.plotly_chart(fig_heat, use_container_width=True)
 
 # 🧬 Detection ratio for Samples
