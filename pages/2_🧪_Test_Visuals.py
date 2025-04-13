@@ -1,6 +1,4 @@
 import streamlit as st
-st.set_page_config(page_title="Test Visuals", layout="wide")  # 🔧 Must be the very first Streamlit call
-
 import pandas as pd
 import plotly.express as px
 from utils.db import listeria_collection
@@ -58,27 +56,3 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         st.plotly_chart(fig_code, use_container_width=True)
     else:
         st.info("No data available to display the Test Frequency by Code chart.")
-
-# 🏭 Test Frequency by Description
-st.subheader("🏭 Test Frequency by Description")
-desc_count = df_filtered["eng_description"].value_counts().reset_index()
-desc_count.columns = ["Description", "Test Count"]
-fig_desc = px.bar(desc_count, x="Test Count", y="Description", orientation="h", title="Test Frequency by Sample Description", color="Test Count", color_continuous_scale="Agsunset")
-st.plotly_chart(fig_desc, use_container_width=True)
-
-# 🧬 Detection Outcome by Code
-st.subheader("🧬 Detection Outcome by Code")
-if "value" in df_filtered.columns:
-    heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="group", title="Detection Outcome by Test Code")
-    st.plotly_chart(fig_heat, use_container_width=True)
-
-# 🧬 Detection ratio for Samples
-st.subheader("🧬 Detection ratio for Samples")
-if 'value' in df_filtered.columns:
-    value_counts = df_filtered['value'].value_counts().reset_index()
-    value_counts.columns = ['value', 'count']
-    fig_value_donut = px.pie(value_counts, names='value', values='count',
-                             hole=0.4, title="Listeria Test Result Breakdown",
-                             color_discrete_sequence=px.colors.sequential.Tealgrn)
-    st.plotly_chart(fig_value_donut, use_container_width=True)
