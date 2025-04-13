@@ -37,27 +37,12 @@ st.sidebar.header("Filters")
 date_range = st.sidebar.date_input("Date Range", [df["sample_date"].min(), df["sample_date"].max()])
 df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sample_date"] <= pd.to_datetime(date_range[1]))]
 
-# 🔢 Test Frequency by Code (Stacked)
+# 🔢 Test Frequency by Code
 st.subheader("🔢 Test Frequency by Code")
-if "value" in df_filtered.columns and "code" in df_filtered.columns:
-    df_code = df_filtered.copy()
-    df_code['Detection'] = df_code['value'].apply(lambda x: "Detected" if x == 1 else ("Not Detected" if x == 0 else "Unknown"))
-    code_detection_counts = df_code.groupby(['code', 'Detection']).size().reset_index(name='count')
-
-    if not code_detection_counts.empty:
-        fig_code = px.bar(
-            code_detection_counts,
-            x="code",
-            y="count",
-            color="Detection",
-            barmode="stack",
-            title="Number of Tests by Code (Detected vs Not Detected)",
-            color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
-        )
-        fig_code.update_layout(legend_title_text="Detection Outcome")
-        st.plotly_chart(fig_code, use_container_width=True)
-    else:
-        st.info("No data available to display the Test Frequency by Code chart.")
+code_count = df_filtered["code"].value_counts().reset_index()
+code_count.columns = ["Code", "Test Count"]
+fig_code = px.bar(code_count, x="Code", y="Test Count", color="Test Count", title="Number of Tests by Code", color_continuous_scale="Sunsetdark")
+st.plotly_chart(fig_code, use_container_width=True)
 
 # 🏭 Test Frequency by Description
 st.subheader("🏭 Test Frequency by Description")
