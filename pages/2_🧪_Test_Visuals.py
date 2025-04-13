@@ -60,11 +60,4 @@ if "value" in df_filtered.columns:
     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
     fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="group", title="Detection Outcome by Test Code")
     st.plotly_chart(fig_heat, use_container_width=True)
-# 🧬 Detection ratio by Description
-st.subheader("🧬 Detection ratio by Description")
-desc_counts = df_filtered['eng_description'].value_counts().reset_index()
-desc_counts.columns = ['eng_description', 'count']
-fig_desc_donut = px.pie(desc_counts, names='eng_description', values='count',
-                        hole=0.4, title="Sample Distribution by Description",
-                        color_discrete_sequence=px.colors.sequential.Magma)
-st.plotly_chart(fig_desc_donut, use_container_width=True)
+
