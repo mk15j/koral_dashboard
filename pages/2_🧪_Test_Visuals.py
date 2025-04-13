@@ -42,9 +42,21 @@ st.subheader("🔢 Test Frequency by Code")
 if "value" in df_filtered.columns:
     freq_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
     freq_df['value'] = freq_df['value'].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
-    fig_code = px.bar(freq_df, x="code", y="count", color="value", barmode="stack",
-                      title="Number of Tests by Code (Detected vs Not Detected)",
-                      color_discrete_map={"Detected": "#FF4C4C", "Not Detected": "#28A745", "Unknown": "#FFA500"})
+
+    # Pivoting for better visualization
+    pivot_df = freq_df.pivot(index='code', columns='value', values='count').fillna(0).reset_index()
+    pivot_df = pivot_df.sort_values(by=["Detected" if "Detected" in pivot_df.columns else "Not Detected"], ascending=False)
+
+    fig_code = px.bar(
+        pivot_df,
+        x="code",
+        y=[col for col in ["Detected", "Not Detected", "Unknown"] if col in pivot_df.columns],
+        title="Number of Tests by Code (Detected vs Not Detected)",
+        color_discrete_map={"Detected": "#FF4C4C", "Not Detected": "#28A745", "Unknown": "#FFA500"},
+        labels={"value": "Detection Outcome", "count": "Number of Tests"},
+        barmode="stack"
+    )
+    fig_code.update_layout(legend_title_text="Detection Outcome")
     st.plotly_chart(fig_code, use_container_width=True)
 
 # 🏭 Test Frequency by Description
