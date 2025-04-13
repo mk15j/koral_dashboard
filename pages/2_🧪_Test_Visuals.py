@@ -40,22 +40,24 @@ df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sam
 # 🔢 Test Frequency by Code (Stacked)
 st.subheader("🔢 Test Frequency by Code")
 if "value" in df_filtered.columns and "code" in df_filtered.columns:
-    df_temp = df_filtered[df_filtered['value'].isin([0, 1])].copy()  # temp filtered for this chart only
-    df_temp['Detection'] = df_temp['value'].map({1: "Detected", 0: "Not Detected"})
-    code_detection_counts = df_temp.groupby(['code', 'Detection']).size().reset_index(name='count')
+    df_code = df_filtered.copy()
+    df_code['Detection'] = df_code['value'].apply(lambda x: "Detected" if x == 1 else ("Not Detected" if x == 0 else "Unknown"))
+    code_detection_counts = df_code.groupby(['code', 'Detection']).size().reset_index(name='count')
 
-    fig_code = px.bar(
-        code_detection_counts,
-        x="code",
-        y="count",
-        color="Detection",
-        barmode="stack",
-        title="Number of Tests by Code (Detected vs Not Detected)",
-        color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C"}
-    )
-    fig_code.update_layout(legend_title_text="Detection Outcome")
-    st.plotly_chart(fig_code, use_container_width=True)
-
+    if not code_detection_counts.empty:
+        fig_code = px.bar(
+            code_detection_counts,
+            x="code",
+            y="count",
+            color="Detection",
+            barmode="stack",
+            title="Number of Tests by Code (Detected vs Not Detected)",
+            color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
+        )
+        fig_code.update_layout(legend_title_text="Detection Outcome")
+        st.plotly_chart(fig_code, use_container_width=True)
+    else:
+        st.info("No data available to display the Test Frequency by Code chart.")
 
 # 🏭 Test Frequency by Description
 st.subheader("🏭 Test Frequency by Description")
