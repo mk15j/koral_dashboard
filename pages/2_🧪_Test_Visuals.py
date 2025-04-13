@@ -63,22 +63,20 @@ st.subheader("🧬 Detection Outcome by Code (with Trendline)")
 if "value" in df_filtered.columns:
     import plotly.graph_objects as go
 
-    # Aggregate detection data
-    heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-
-    # Create pivot for Detected and Not Detected
-    pivot_df = heat_df.pivot(index="code", columns="value", values="count").fillna(0)
-    pivot_df.columns = pivot_df.columns.astype(int)  # Ensure columns are integers
-    pivot_df = pivot_df.sort_index()
+    # Map values to readable labels
+    df_filtered["Detection"] = df_filtered["value"].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    
+    # Group and pivot
+    heat_df = df_filtered.groupby(["code", "Detection"]).size().reset_index(name="count")
+    pivot_df = heat_df.pivot(index="code", columns="Detection", values="count").fillna(0)
 
     codes = pivot_df.index.tolist()
-    detected_counts = pivot_df.get(1, pd.Series([0]*len(codes), index=codes))
-    not_detected_counts = pivot_df.get(0, pd.Series([0]*len(codes), index=codes))
+    detected_counts = pivot_df.get("Detected", pd.Series([0]*len(codes), index=codes))
+    not_detected_counts = pivot_df.get("Not Detected", pd.Series([0]*len(codes), index=codes))
 
-    # Create stacked bar chart with trendline
+    # Create stacked bar + trendline
     fig = go.Figure()
 
-    # Not Detected bar
     fig.add_trace(go.Bar(
         x=codes,
         y=not_detected_counts,
@@ -86,7 +84,6 @@ if "value" in df_filtered.columns:
         marker_color="#2CA02C"
     ))
 
-    # Detected bar
     fig.add_trace(go.Bar(
         x=codes,
         y=detected_counts,
@@ -94,7 +91,6 @@ if "value" in df_filtered.columns:
         marker_color="#D62728"
     ))
 
-    # Trendline over Detected
     fig.add_trace(go.Scatter(
         x=codes,
         y=detected_counts,
