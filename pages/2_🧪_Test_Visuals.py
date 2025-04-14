@@ -174,7 +174,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         x=codes,
         y=not_detected_counts,
         name="Not Detected",
-        marker_color="#00FFFF"  # Neon cyan
+        marker_color="#39FF14"  # Neon cyan
     ))
 
     # Detected Bar
@@ -182,7 +182,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         x=codes,
         y=detected_counts,
         name="Detected",
-        marker_color="#39FF14"  # Neon green
+        marker_color="#8A00C4"  # Neon green
     ))
 
     # Trendline (Detected)
@@ -191,7 +191,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         y=detected_counts,
         name="Detection Trendline",
         mode="lines+markers",
-        line=dict(color="#FF00FF", width=3, dash="dash")  # Neon magenta
+        line=dict(color="#FF3131", width=3, dash="dash")  # Neon magenta
     ))
 
     # Layout
@@ -201,8 +201,8 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         xaxis_title="Location Code",
         yaxis_title="Number of Samples",
         legend_title="Detection Outcome",
-        plot_bgcolor="#0D0D0D",  # Dark background
-        paper_bgcolor="#0D0D0D",
+        plot_bgcolor="#000000",  # Dark background
+        paper_bgcolor="#000000",
         font=dict(color="#FFFFFF")  # White font for dark mode
     )
 
