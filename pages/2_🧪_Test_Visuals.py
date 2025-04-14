@@ -159,14 +159,14 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
     st.plotly_chart(fig_area_code, use_container_width=True)
 
 # 🧬 Detection ratio for Samples
-st.subheader("🧬 Detection ratio for Samples")
-if 'value' in df_filtered.columns:
-    value_counts = df_filtered['value'].value_counts().reset_index()
-    value_counts.columns = ['value', 'count']
-    fig_value_donut = px.pie(value_counts, names='value', values='count',
-                             hole=0.4, title="Listeria Test Result Breakdown",
-                             color_discrete_sequence=px.colors.sequential.Tealgrn)
-    st.plotly_chart(fig_value_donut, use_container_width=True)
+# st.subheader("🧬 Detection ratio for Samples")
+# if 'value' in df_filtered.columns:
+#     value_counts = df_filtered['value'].value_counts().reset_index()
+#     value_counts.columns = ['value', 'count']
+#     fig_value_donut = px.pie(value_counts, names='value', values='count',
+#                              hole=0.4, title="Listeria Test Result Breakdown",
+#                              color_discrete_sequence=px.colors.sequential.Tealgrn)
+#     st.plotly_chart(fig_value_donut, use_container_width=True)
 
 # 🧬 Detection ratio for Samples
 st.subheader("🧬 Detection ratio for Samples")
@@ -189,7 +189,7 @@ if 'value' in df_filtered.columns:
         names='value',
         values='count',
         hole=0.4,
-        title="Listeria Test Result Breakdown",
+        # title="Listeria Test Result Breakdown",
         color_discrete_sequence=custom_colors
     )
 
