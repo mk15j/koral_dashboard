@@ -169,7 +169,7 @@ if 'value' in df_filtered.columns:
 
     # Define custom neon colors for categories
     color_map = {
-        "Detected": "#BF00FF",        # Neon Purple 
+        "Detected": "#8A00C4",        # Neon Purple 
         "Not Detected": "#39FF14"     # Neon Green
     }
 
