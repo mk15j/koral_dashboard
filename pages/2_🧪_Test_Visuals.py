@@ -58,56 +58,6 @@ if "value" in df_filtered.columns:
     fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="stack", title="Detection Outcome by Test Code")
     st.plotly_chart(fig_heat, use_container_width=True)
 
-# 🧬 Detection Outcome by Code with Trendline
-# st.subheader("🧬 Detection Outcome by Code (with Trendline)")
-# if "value" in df_filtered.columns:
-#     import plotly.graph_objects as go
-
-#     # Map values to readable labels
-#     df_filtered["Detection"] = df_filtered["value"].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
-    
-#     # Group and pivot
-#     heat_df = df_filtered.groupby(["code", "Detection"]).size().reset_index(name="count")
-#     pivot_df = heat_df.pivot(index="code", columns="Detection", values="count").fillna(0)
-
-#     codes = pivot_df.index.tolist()
-#     detected_counts = pivot_df.get("Detected", pd.Series([0]*len(codes), index=codes))
-#     not_detected_counts = pivot_df.get("Not Detected", pd.Series([0]*len(codes), index=codes))
-
-#     # Create stacked bar + trendline
-#     fig = go.Figure()
-
-#     fig.add_trace(go.Bar(
-#         x=codes,
-#         y=not_detected_counts,
-#         name="Not Detected",
-#         marker_color="#2CA02C"
-#     ))
-
-#     fig.add_trace(go.Bar(
-#         x=codes,
-#         y=detected_counts,
-#         name="Detected",
-#         marker_color="#D62728"
-#     ))
-
-#     fig.add_trace(go.Scatter(
-#         x=codes,
-#         y=detected_counts,
-#         name="Detection Trendline",
-#         mode="lines+markers",
-#         line=dict(color="red", width=2, dash="dash")
-#     ))
-
-#     fig.update_layout(
-#         barmode="stack",
-#         title="Detection Outcome by Test Code (with Detection Trendline)",
-#         xaxis_title="Test Code",
-#         yaxis_title="Test Count",
-#         legend_title="Detection Outcome"
-#     )
-
-#     st.plotly_chart(fig, use_container_width=True)
 
 # 📊 Detection Outcome by Code (Area Chart)
 st.subheader("📊 Detection Outcome by Code (Area Chart)")
