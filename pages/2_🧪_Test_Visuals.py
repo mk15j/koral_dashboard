@@ -82,7 +82,7 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
         color="Detection",
         line_group="Detection",
         title="Detection Outcome by Code (Detected vs Not Detected)",
-        color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
+        color_discrete_map={"Detected": "#FF3131", "Not Detected": "#39FF14", "Unknown": "#FF5C00"}
     )
 
     fig_area_code.update_layout(
@@ -133,7 +133,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         x=codes,
         y=not_detected_counts,
         name="Not Detected",
-        marker_color="#39FF14"  # Neon cyan
+        marker_color="#39FF14"  # Neon Green
     ))
 
     # Detected Bar
@@ -141,7 +141,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         x=codes,
         y=detected_counts,
         name="Detected",
-        marker_color="#8A00C4"  # Neon green
+        marker_color="#8A00C4"  # Neon Purple
     ))
 
     # Trendline (Detected)
@@ -150,7 +150,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         y=detected_counts,
         name="Detection Trendline",
         mode="lines+markers",
-        line=dict(color="#FF3131", width=1, dash="dash")  # Neon magenta
+        line=dict(color="#FF3131", width=1, dash="dash")  # Neon Red
     ))
 
     # Layout
