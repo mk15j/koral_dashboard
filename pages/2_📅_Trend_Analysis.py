@@ -17,8 +17,6 @@ if st.sidebar.button("Logout"):
     st.success("🔓 Logged out successfully.")
     st.stop()
 
-# 📅 Page content
-st.title("📅 Trend Analysis")
 
 # 📅 Page content
 st.title("📅 Trend Analysis")
