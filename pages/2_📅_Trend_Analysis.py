@@ -26,15 +26,19 @@ def load_data():
     df["sample_date"] = pd.to_datetime(df["sample_date"], errors="coerce")
     return df
 
-df = load_data()
-
-# 💡 Create detection column
+# 🧪 Label Detection
 df["Detection"] = df["value"].apply(lambda x: "Detected" if x != "Not Detected" else "Not Detected")
 
-# 📈 Group data by date and detection status
+# 🗓️ Restrict date range for X-axis
+start_date = pd.to_datetime("2025-02-03")
+end_date = pd.to_datetime("2025-03-28")
+
+df = df[(df["sample_date"] >= start_date) & (df["sample_date"] <= end_date)]
+
+# 📊 Group by date and detection
 trend_df = df.groupby(["sample_date", "Detection"]).size().reset_index(name="count")
 
-# 📊 Line chart with custom colors
+# 💎 Plot line chart with value labels and diamond markers
 fig = px.line(
     trend_df,
     x="sample_date",
@@ -45,10 +49,22 @@ fig = px.line(
     color_discrete_map={
         "Detected": "#8A00C4",       # Neon Purple
         "Not Detected": "#39FF14"    # Neon Green
-    }
+    },
+    markers=True
 )
 
+# 🔧 Customize markers and annotations
+fig.update_traces(marker=dict(symbol="diamond", size=10), text=trend_df["count"], textposition="top center")
+
+# 🛠️ Customize x-axis to show all dates vertically
+all_dates = pd.date_range(start=start_date, end=end_date, freq='D')
 fig.update_layout(
+    xaxis=dict(
+        tickmode='array',
+        tickvals=all_dates,
+        tickformat='%d-%b',
+        tickangle=90
+    ),
     xaxis_title="Sample Date",
     yaxis_title="Number of Samples",
     legend_title="Detection Result"
