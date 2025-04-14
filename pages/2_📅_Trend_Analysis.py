@@ -28,10 +28,44 @@ def load_data():
 
 df = load_data()
 
-trend = df.groupby(["test", "sample_date"])["value"].apply(lambda x: (x != "Not Detected").sum()).reset_index()
+# 💡 Create detection column
+df["Detection"] = df["value"].apply(lambda x: "Detected" if x != "Not Detected" else "Not Detected")
 
-fig = px.line(trend, x="sample_date", y="value", color="test",
-              title="Detection Trends by Test",
-              template="plotly_dark", color_discrete_sequence=px.colors.qualitative.T10)
+# 📈 Group data by date and detection status
+trend_df = df.groupby(["sample_date", "Detection"]).size().reset_index(name="count")
+
+# 📊 Line chart with custom colors
+fig = px.line(
+    trend_df,
+    x="sample_date",
+    y="count",
+    color="Detection",
+    title="Detection Trend Over Time",
+    template="plotly_dark",
+    color_discrete_map={
+        "Detected": "#8A00C4",       # Neon Purple
+        "Not Detected": "#39FF14"    # Neon Green
+    }
+)
+
+fig.update_layout(
+    xaxis_title="Sample Date",
+    yaxis_title="Number of Samples",
+    legend_title="Detection Result"
+)
 
 st.plotly_chart(fig, use_container_width=True)
+
+
+
+
+
+# df = load_data()
+
+# trend = df.groupby(["test", "sample_date"])["value"].apply(lambda x: (x != "Not Detected").sum()).reset_index()
+
+# fig = px.line(trend, x="sample_date", y="value", color="test",
+#               title="Detection Trends by Test",
+#               template="plotly_dark", color_discrete_sequence=px.colors.qualitative.T10)
+
+# st.plotly_chart(fig, use_container_width=True)
