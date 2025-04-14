@@ -18,7 +18,7 @@ if st.sidebar.button("Logout"):
     st.stop()
 
 # 🥚 Main content
-st.title("🥚 Test Summary Visuals")
+# st.title("🥚 Test Summary Visuals")
 
 @st.cache_data
 def load_data():
@@ -39,7 +39,7 @@ df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sam
 
 
 # 🧬 Detection Outcome by Code with Trendline
-st.subheader("🧬 Detection Outcome by Code - Trendline)")
+st.subheader("🧬 Detection Outcome by Code - Trendline")
 
 if "value" in df_filtered.columns and "code" in df_filtered.columns:
     import plotly.graph_objects as go
