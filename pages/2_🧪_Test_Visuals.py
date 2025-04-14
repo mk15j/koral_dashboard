@@ -195,8 +195,8 @@ if 'value' in df_filtered.columns:
 
     # Optional: dark theme style
     fig_value_donut.update_layout(
-        plot_bgcolor="#0D0D0D",
-        paper_bgcolor="#0D0D0D",
+        plot_bgcolor="#FFFFFF",
+        paper_bgcolor="#FFFFFF",
         font=dict(color="#FFFFFF")
     )
 
