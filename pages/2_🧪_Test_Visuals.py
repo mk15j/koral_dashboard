@@ -191,7 +191,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         y=detected_counts,
         name="Detection Trendline",
         mode="lines+markers",
-        line=dict(color="#FF3131", width=3, dash="dash")  # Neon magenta
+        line=dict(color="#FF3131", width=1, dash="dash")  # Neon magenta
     ))
 
     # Layout
