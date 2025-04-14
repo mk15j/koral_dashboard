@@ -109,37 +109,31 @@ if "value" in df_filtered.columns:
 
 #     st.plotly_chart(fig, use_container_width=True)
 
-# 📈 Weekly Detection Trend Area Chart
-st.subheader("📈 Weekly Detection Trend (Detected vs Not Detected)")
+# 📊 Detection Outcome Trend by Code (Area Chart)
+st.subheader("📊 Detection Outcome by Code (Area Chart)")
 
-if "sample_date" in df_filtered.columns and "value" in df_filtered.columns:
-    df_weekly = df_filtered.copy()
-
-    # Ensure dates are in datetime
-    df_weekly["sample_date"] = pd.to_datetime(df_weekly["sample_date"], errors="coerce")
+if "code" in df_filtered.columns and "value" in df_filtered.columns:
+    df_code_area = df_filtered.copy()
 
     # Map detection labels
-    df_weekly["Detection"] = df_weekly["value"].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    df_code_area["Detection"] = df_code_area["value"].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
 
-    # Extract ISO week and year
-    df_weekly["Week"] = df_weekly["sample_date"].dt.to_period("W").apply(lambda r: r.start_time)
+    # Group by code and detection status
+    detection_by_code = df_code_area.groupby(["code", "Detection"]).size().reset_index(name="Count")
 
-    # Group by week and detection type
-    weekly_counts = df_weekly.groupby(["Week", "Detection"]).size().reset_index(name="Count")
-
-    # Plot stacked area chart
-    fig_weekly = px.area(
-        weekly_counts,
-        x="Week",
+    # Plot as area chart
+    fig_area_code = px.area(
+        detection_by_code,
+        x="code",
         y="Count",
         color="Detection",
         line_group="Detection",
-        title="Weekly Trend of Detected vs Not Detected",
+        title="Detection Outcome by Code (Detected vs Not Detected)",
         color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
     )
-    fig_weekly.update_layout(xaxis_title="Week", yaxis_title="Count", legend_title="Detection Outcome")
+    fig_area_code.update_layout(xaxis_title="Code", yaxis_title="Count", legend_title="Detection Outcome")
 
-    st.plotly_chart(fig_weekly, use_container_width=True)
+    st.plotly_chart(fig_area_code, use_container_width=True)
 
 
 # 🧬 Detection ratio for Samples
