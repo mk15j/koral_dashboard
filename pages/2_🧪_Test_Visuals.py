@@ -147,7 +147,7 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
         color="Detection",
         line_group="Detection",
         title="Detection Outcome by Code (Detected vs Not Detected)",
-        color_discrete_map={"Detected": "#FF3131", "Not Detected": "#39FF14", "Unknown": "#FF5C00"}
+        color_discrete_map={"Detected": "#8A00C4", "Not Detected": "#39FF14", "Unknown": "#FF5C00"}
     )
 
     fig_area_code.update_layout(
