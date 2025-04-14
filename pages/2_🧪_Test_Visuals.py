@@ -142,6 +142,46 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
     )
 
     st.plotly_chart(fig_area_code, use_container_width=True)
+# 📊 Detection Outcome by Code (Area Chart with Neon Colors)
+st.subheader("📊 Detection Outcome by Code (Neon Glow Theme)")
+
+if "code" in df_filtered.columns and "value" in df_filtered.columns:
+    df_code_area = df_filtered.copy()
+
+    # Normalize detection values
+    df_code_area["Detection"] = df_code_area["value"].map({
+        "Detected": "Detected",
+        "Not Detected": "Not Detected"
+    }).fillna("Unknown")
+
+    # Group by code and detection status
+    detection_by_code = df_code_area.groupby(["code", "Detection"]).size().reset_index(name="Count")
+
+    # Plot as area chart with neon colors
+    fig_area_code = px.area(
+        detection_by_code,
+        x="code",
+        y="Count",
+        color="Detection",
+        line_group="Detection",
+        title="🟢 Neon Detection Outcome by Code",
+        color_discrete_map={
+            "Detected": "#39FF14",       # Neon green
+            "Not Detected": "#00FFFF",   # Cyan / Neon blue
+            "Unknown": "#FF00FF"         # Magenta
+        }
+    )
+
+    fig_area_code.update_layout(
+        xaxis_title="Test Code (Location)",
+        yaxis_title="Number of Samples",
+        legend_title="Detection Outcome",
+        plot_bgcolor="#0D0D0D",  # Dark background
+        paper_bgcolor="#0D0D0D",
+        font=dict(color="#FFFFFF"),  # White text
+    )
+
+    st.plotly_chart(fig_area_code, use_container_width=True)
 
 
 # 🧬 Detection ratio for Samples
