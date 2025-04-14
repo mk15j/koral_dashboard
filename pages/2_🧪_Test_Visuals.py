@@ -39,7 +39,7 @@ df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sam
 
 
 # 🧬 Detection Outcome by Code with Trendline
-#st.subheader("🧬 Detection Outcome by Code (with Trendline)")
+st.subheader("🧬 Detection Outcome by Code - Trendline)")
 
 if "value" in df_filtered.columns and "code" in df_filtered.columns:
     import plotly.graph_objects as go
@@ -90,7 +90,7 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
     # Layout
     fig.update_layout(
         barmode="stack",
-        title="🧬 Detection Outcome by Code (with Detection Trendline)",
+        # title="🧬 Detection Outcome by Code (with Detection Trendline)",
         xaxis_title="Location Code",
         yaxis_title="Number of Samples",
         legend_title="Detection Outcome",
