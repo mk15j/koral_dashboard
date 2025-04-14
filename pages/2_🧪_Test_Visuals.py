@@ -143,3 +143,68 @@ if 'value' in df_filtered.columns:
                              hole=0.4, title="Listeria Test Result Breakdown",
                              color_discrete_sequence=px.colors.sequential.Tealgrn)
     st.plotly_chart(fig_value_donut, use_container_width=True)
+
+
+# 🧬 Detection Outcome by Code with Trendline
+st.subheader("🧬 Detection Outcome by Code (with Trendline)")
+
+if "value" in df_filtered.columns and "code" in df_filtered.columns:
+    import plotly.graph_objects as go
+
+    # Clean and normalize detection values
+    df_filtered["Detection"] = df_filtered["value"].map({
+        "Detected": "Detected",
+        "Not Detected": "Not Detected"
+    }).fillna("Unknown")
+
+    # Group by code and detection outcome
+    heat_df = df_filtered.groupby(["code", "Detection"]).size().reset_index(name="count")
+    pivot_df = heat_df.pivot(index="code", columns="Detection", values="count").fillna(0)
+
+    # Prepare data
+    codes = pivot_df.index.tolist()
+    detected_counts = pivot_df["Detected"] if "Detected" in pivot_df.columns else pd.Series([0]*len(codes), index=codes)
+    not_detected_counts = pivot_df["Not Detected"] if "Not Detected" in pivot_df.columns else pd.Series([0]*len(codes), index=codes)
+
+    # Plotting
+    fig = go.Figure()
+
+    # Not Detected Bar
+    fig.add_trace(go.Bar(
+        x=codes,
+        y=not_detected_counts,
+        name="Not Detected",
+        marker_color="#00FFFF"  # Neon cyan
+    ))
+
+    # Detected Bar
+    fig.add_trace(go.Bar(
+        x=codes,
+        y=detected_counts,
+        name="Detected",
+        marker_color="#39FF14"  # Neon green
+    ))
+
+    # Trendline (Detected)
+    fig.add_trace(go.Scatter(
+        x=codes,
+        y=detected_counts,
+        name="Detection Trendline",
+        mode="lines+markers",
+        line=dict(color="#FF00FF", width=3, dash="dash")  # Neon magenta
+    ))
+
+    # Layout
+    fig.update_layout(
+        barmode="stack",
+        title="🧬 Detection Outcome by Code (with Detection Trendline)",
+        xaxis_title="Location Code",
+        yaxis_title="Number of Samples",
+        legend_title="Detection Outcome",
+        plot_bgcolor="#0D0D0D",  # Dark background
+        paper_bgcolor="#0D0D0D",
+        font=dict(color="#FFFFFF")  # White font for dark mode
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
