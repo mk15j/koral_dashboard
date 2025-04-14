@@ -106,7 +106,8 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
 st.subheader("🔢 Test Frequency by Code")
 code_count = df_filtered["code"].value_counts().reset_index()
 code_count.columns = ["Code", "Test Count"]
-fig_code = px.bar(code_count, x="Code", y="Test Count", color="Test Count", title="Number of Tests by Code", color_continuous_scale="Sunsetdark")
+fig_code = px.bar(code_count, x="Code", y="Test Count", color="Test Count", color_continuous_scale="Sunsetdark")
+# title="Number of Tests by Code", 
 st.plotly_chart(fig_code, use_container_width=True)
 
 # 🏭 Test Frequency by Description
@@ -117,15 +118,16 @@ st.plotly_chart(fig_code, use_container_width=True)
 # st.plotly_chart(fig_desc, use_container_width=True)
 
 # 🧬 Detection Outcome by Code
-st.subheader("🧬 Detection Outcome by Code")
+st.subheader("🧬 Detection Outcome by Code - Stacked Chart")
 if "value" in df_filtered.columns:
     heat_df = df_filtered.groupby(["code", "value"]).size().reset_index(name="count")
-    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="stack", title="Detection Outcome by Test Code")
+    fig_heat = px.bar(heat_df, x="code", y="count", color="value", barmode="stack")
+    #, title="Detection Outcome by Test Code"
     st.plotly_chart(fig_heat, use_container_width=True)
 
 
 # 📊 Detection Outcome by Code (Area Chart)
-st.subheader("📊 Detection Outcome by Code (Area Chart)")
+st.subheader("📊 Detection Outcome by Code - Area Chart")
 
 if "code" in df_filtered.columns and "value" in df_filtered.columns:
     df_code_area = df_filtered.copy()
@@ -146,7 +148,7 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
         y="Count",
         color="Detection",
         line_group="Detection",
-        title="Detection Outcome by Code (Detected vs Not Detected)",
+        # title="Detection Outcome by Code (Detected vs Not Detected)",
         color_discrete_map={"Detected": "#8A00C4", "Not Detected": "#39FF14", "Unknown": "#FF5C00"}
     )
 
@@ -161,7 +163,7 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
 
 
 # 🧬 Detection ratio for Samples
-st.subheader("🧬 Detection ratio for Samples")
+st.subheader("🧬 Detection Ratio for Samples")
 
 if 'value' in df_filtered.columns:
     value_counts = df_filtered['value'].value_counts().reset_index()
