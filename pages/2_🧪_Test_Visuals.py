@@ -201,9 +201,9 @@ if "value" in df_filtered.columns and "code" in df_filtered.columns:
         xaxis_title="Location Code",
         yaxis_title="Number of Samples",
         legend_title="Detection Outcome",
-        plot_bgcolor="#000000",  # Dark background
-        paper_bgcolor="#000000",
-        font=dict(color="#FFFFFF")  # White font for dark mode
+        plot_bgcolor="#FFFFFF",  # Dark background
+        paper_bgcolor="#FFFFFF",
+        font=dict(color="#000000")  # White font for dark mode
     )
 
     st.plotly_chart(fig, use_container_width=True)
