@@ -109,14 +109,17 @@ if "value" in df_filtered.columns:
 
 #     st.plotly_chart(fig, use_container_width=True)
 
-# 📊 Detection Outcome Trend by Code (Area Chart)
+# 📊 Detection Outcome by Code (Area Chart)
 st.subheader("📊 Detection Outcome by Code (Area Chart)")
 
 if "code" in df_filtered.columns and "value" in df_filtered.columns:
     df_code_area = df_filtered.copy()
 
-    # Map detection labels
-    df_code_area["Detection"] = df_code_area["value"].map({1: "Detected", 0: "Not Detected"}).fillna("Unknown")
+    # Normalize detection values
+    df_code_area["Detection"] = df_code_area["value"].map({
+        "Detected": "Detected",
+        "Not Detected": "Not Detected"
+    }).fillna("Unknown")
 
     # Group by code and detection status
     detection_by_code = df_code_area.groupby(["code", "Detection"]).size().reset_index(name="Count")
@@ -131,7 +134,12 @@ if "code" in df_filtered.columns and "value" in df_filtered.columns:
         title="Detection Outcome by Code (Detected vs Not Detected)",
         color_discrete_map={"Detected": "#D62728", "Not Detected": "#2CA02C", "Unknown": "#FF7F0E"}
     )
-    fig_area_code.update_layout(xaxis_title="Code", yaxis_title="Count", legend_title="Detection Outcome")
+
+    fig_area_code.update_layout(
+        xaxis_title="Test Code (Location)",
+        yaxis_title="Number of Samples",
+        legend_title="Detection Outcome"
+    )
 
     st.plotly_chart(fig_area_code, use_container_width=True)
 
