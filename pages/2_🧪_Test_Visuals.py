@@ -37,6 +37,71 @@ st.sidebar.header("Filters")
 date_range = st.sidebar.date_input("Date Range", [df["sample_date"].min(), df["sample_date"].max()])
 df_filtered = df[(df["sample_date"] >= pd.to_datetime(date_range[0])) & (df["sample_date"] <= pd.to_datetime(date_range[1]))]
 
+
+# 🧬 Detection Outcome by Code with Trendline
+st.subheader("🧬 Detection Outcome by Code (with Trendline)")
+
+if "value" in df_filtered.columns and "code" in df_filtered.columns:
+    import plotly.graph_objects as go
+
+    # Clean and normalize detection values
+    df_filtered["Detection"] = df_filtered["value"].map({
+        "Detected": "Detected",
+        "Not Detected": "Not Detected"
+    }).fillna("Unknown")
+
+    # Group by code and detection outcome
+    heat_df = df_filtered.groupby(["code", "Detection"]).size().reset_index(name="count")
+    pivot_df = heat_df.pivot(index="code", columns="Detection", values="count").fillna(0)
+
+    # Prepare data
+    codes = pivot_df.index.tolist()
+    detected_counts = pivot_df["Detected"] if "Detected" in pivot_df.columns else pd.Series([0]*len(codes), index=codes)
+    not_detected_counts = pivot_df["Not Detected"] if "Not Detected" in pivot_df.columns else pd.Series([0]*len(codes), index=codes)
+
+    # Plotting
+    fig = go.Figure()
+
+    # Not Detected Bar
+    fig.add_trace(go.Bar(
+        x=codes,
+        y=not_detected_counts,
+        name="Not Detected",
+        marker_color="#39FF14"  # Neon Green
+    ))
+
+    # Detected Bar
+    fig.add_trace(go.Bar(
+        x=codes,
+        y=detected_counts,
+        name="Detected",
+        marker_color="#8A00C4"  # Neon Purple
+    ))
+
+    # Trendline (Detected)
+    fig.add_trace(go.Scatter(
+        x=codes,
+        y=detected_counts,
+        name="Detection Trendline",
+        mode="lines+markers",
+        line=dict(color="#FF3131", width=1, dash="dash")  # Neon Red
+    ))
+
+    # Layout
+    fig.update_layout(
+        barmode="stack",
+        title="🧬 Detection Outcome by Code (with Detection Trendline)",
+        xaxis_title="Location Code",
+        yaxis_title="Number of Samples",
+        legend_title="Detection Outcome",
+        plot_bgcolor="#FFFFFF",  # Dark background
+        paper_bgcolor="#FFFFFF",
+        font=dict(color="#000000")  # White font for dark mode
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
 # 🔢 Test Frequency by Code
 st.subheader("🔢 Test Frequency by Code")
 code_count = df_filtered["code"].value_counts().reset_index()
@@ -104,66 +169,5 @@ if 'value' in df_filtered.columns:
     st.plotly_chart(fig_value_donut, use_container_width=True)
 
 
-# 🧬 Detection Outcome by Code with Trendline
-st.subheader("🧬 Detection Outcome by Code (with Trendline)")
 
-if "value" in df_filtered.columns and "code" in df_filtered.columns:
-    import plotly.graph_objects as go
-
-    # Clean and normalize detection values
-    df_filtered["Detection"] = df_filtered["value"].map({
-        "Detected": "Detected",
-        "Not Detected": "Not Detected"
-    }).fillna("Unknown")
-
-    # Group by code and detection outcome
-    heat_df = df_filtered.groupby(["code", "Detection"]).size().reset_index(name="count")
-    pivot_df = heat_df.pivot(index="code", columns="Detection", values="count").fillna(0)
-
-    # Prepare data
-    codes = pivot_df.index.tolist()
-    detected_counts = pivot_df["Detected"] if "Detected" in pivot_df.columns else pd.Series([0]*len(codes), index=codes)
-    not_detected_counts = pivot_df["Not Detected"] if "Not Detected" in pivot_df.columns else pd.Series([0]*len(codes), index=codes)
-
-    # Plotting
-    fig = go.Figure()
-
-    # Not Detected Bar
-    fig.add_trace(go.Bar(
-        x=codes,
-        y=not_detected_counts,
-        name="Not Detected",
-        marker_color="#39FF14"  # Neon Green
-    ))
-
-    # Detected Bar
-    fig.add_trace(go.Bar(
-        x=codes,
-        y=detected_counts,
-        name="Detected",
-        marker_color="#8A00C4"  # Neon Purple
-    ))
-
-    # Trendline (Detected)
-    fig.add_trace(go.Scatter(
-        x=codes,
-        y=detected_counts,
-        name="Detection Trendline",
-        mode="lines+markers",
-        line=dict(color="#FF3131", width=1, dash="dash")  # Neon Red
-    ))
-
-    # Layout
-    fig.update_layout(
-        barmode="stack",
-        title="🧬 Detection Outcome by Code (with Detection Trendline)",
-        xaxis_title="Location Code",
-        yaxis_title="Number of Samples",
-        legend_title="Detection Outcome",
-        plot_bgcolor="#FFFFFF",  # Dark background
-        paper_bgcolor="#FFFFFF",
-        font=dict(color="#000000")  # White font for dark mode
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
 
