@@ -168,6 +168,41 @@ if 'value' in df_filtered.columns:
                              color_discrete_sequence=px.colors.sequential.Tealgrn)
     st.plotly_chart(fig_value_donut, use_container_width=True)
 
+# 🧬 Detection ratio for Samples
+st.subheader("🧬 Detection ratio for Samples")
+
+if 'value' in df_filtered.columns:
+    value_counts = df_filtered['value'].value_counts().reset_index()
+    value_counts.columns = ['value', 'count']
+
+    # Define custom neon colors for categories
+    color_map = {
+        "Detected": "#39FF14",        # Neon Green
+        "Not Detected": "#BF00FF"     # Neon Purple
+    }
+
+    # Ensure the colors align with the data order
+    custom_colors = [color_map.get(v, "#FFFFFF") for v in value_counts['value']]
+
+    fig_value_donut = px.pie(
+        value_counts,
+        names='value',
+        values='count',
+        hole=0.4,
+        title="Listeria Test Result Breakdown",
+        color_discrete_sequence=custom_colors
+    )
+
+    # Optional: dark theme style
+    fig_value_donut.update_layout(
+        plot_bgcolor="#0D0D0D",
+        paper_bgcolor="#0D0D0D",
+        font=dict(color="#FFFFFF")
+    )
+
+    st.plotly_chart(fig_value_donut, use_container_width=True)
+
+
 
 
 
