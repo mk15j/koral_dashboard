@@ -1,6 +1,6 @@
 
 import streamlit as st
-
+import pandas as pd
 from utils.db import listeria_collection
 
 # 🔐 Check if user is logged in
