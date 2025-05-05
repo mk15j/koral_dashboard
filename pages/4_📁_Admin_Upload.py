@@ -35,54 +35,62 @@ from utils.db import listeria_collection
 #         listeria_collection.insert_many(data)
 #         st.success(f"{len(data)} records uploaded successfully.")
 
+# 🔐 Check if user is logged in
+if "user" not in st.session_state:
+    st.warning("Please log in to access this page.")
+    st.stop()
 
-    if st.session_state.get("role") != "admin":
-        st.error("Unauthorized Access! Admins only.")
-        return
+# 🛡️ Restrict to admins only
+if st.session_state.get("user", {}).get("role") != "admin":
+    st.error("You do not have permission to access this page.")
+    st.stop()
 
-    st.title("Admin: Upload Listeria Results Data")
+# 👤 Display user info and logout option
+st.sidebar.markdown(f"👤 Logged in as: `{st.session_state.user['username']}`")
+if st.sidebar.button("Logout"):
+    st.session_state.clear()
+    st.success("🔓 Logged out successfully.")
+    st.stop()
 
-    uploaded_file = st.file_uploader("Upload Results File", type=["csv"])
+# 📁 Upload section
+st.title("📁 Admin: Upload Listeria Results Data")
 
-    if uploaded_file is None:
-        st.warning("Please upload a CSV file.")
-        return
+uploaded_file = st.file_uploader("Upload Results File", type=["csv"])
+if uploaded_file is None:
+    st.warning("Please upload a CSV file.")
+    st.stop()
 
+try:
+    df = pd.read_csv(uploaded_file, encoding="utf-8", encoding_errors="replace")
+except Exception as e:
+    st.error(f"Error reading CSV file: {e}")
+    st.stop()
+
+st.write(df.head())  # Preview data
+
+# ✅ Required columns
+required_columns = {
+    "eurofins_order", "sample_code", "order_ref", "sample_description", 
+    "sample_date", "test_code", "test", "parameter", "value", "unit", 
+    "receiving_lab", "eng_description", "code", "x", "y", "values", "points"
+}
+if not required_columns.issubset(df.columns):
+    st.error(f"Missing required columns: {', '.join(required_columns - set(df.columns))}")
+    st.stop()
+
+# 🕓 Date parsing
+df["sample_date"] = pd.to_datetime(df["sample_date"], format="%d-%m-%Y", errors="coerce")
+df["sample_date"] = df["sample_date"].where(df["sample_date"].notna(), None)
+
+# 🧑 Add uploader info
+username = st.session_state.user.get("username", "admin")
+df["uploaded_by"] = username
+
+# 📤 Upload to MongoDB
+if st.button("Upload to MongoDB"):
     try:
-        # Try different encodings if UTF-8 fails
-        df = pd.read_csv(uploaded_file, encoding="utf-8", encoding_errors="replace")
-    except Exception as e:
-        st.error(f"Error reading CSV file: {e}")
-        return  # Stop execution if file reading fails
-
-    st.write(df.head())  # Display first few rows for debugging
-
-    # Validate required columns
-    required_columns = {
-        "eurofins_order", "sample_code", "order_ref", "sample_description", 
-        "sample_date", "test_code", "test", "parameter", "value", "unit", "receiving_lab", "eng_description", "code", "x", "y", "values", "points"
-    }
-    if not required_columns.issubset(df.columns):
-        st.error(f"File must contain columns: {', '.join(required_columns)}")
-        return
-
-    # Convert sample_date to datetime
-    df["sample_date"] = pd.to_datetime(df["sample_date"], format="%d-%m-%Y", errors="coerce")
-
-    # Replace NaT with None to prevent MongoDB errors
-    df["sample_date"] = df["sample_date"].where(df["sample_date"].notna(), None)
-
-    # Add admin username for tracking
-    username = st.session_state.get("username", "admin")
-
-    # Convert DataFrame to MongoDB format
-    data_list = df.to_dict(orient="records")
-    for item in data_list:
-        item["username"] = username  # Track uploader
-
-    # Insert data into MongoDB
-    try:
+        data_list = df.to_dict(orient="records")
         result = listeria_collection.insert_many(data_list)
-        st.success(f"Inserted {len(result.inserted_ids)} records into the database!")
+        st.success(f"✅ Inserted {len(result.inserted_ids)} records into the database!")
     except Exception as e:
-        st.error(f"Database Error: {e}")
+        st.error(f"❌ Database Error: {e}")
