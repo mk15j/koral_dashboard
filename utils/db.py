@@ -10,4 +10,4 @@ client = MongoClient(MONGO_URI)
 db = client["koral"]
 
 users_collection = db["users"]
-listeria_collection = db["listeria"]
+listeria_collection = db["fresh"]
